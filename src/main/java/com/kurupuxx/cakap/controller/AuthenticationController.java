@@ -36,7 +36,6 @@ public class AuthenticationController {
 
     @GetMapping("/user")
     public ResponseEntity<GetDetailUserResponse> getDetailUser(@RequestParam("token") String token) {
-        System.out.println(token);
         return userService.getDetailUser(token);
     }
 }
