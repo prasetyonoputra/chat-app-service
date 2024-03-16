@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         } catch (BadCredentialsException e) {
-            authenticationResponse.setMessage("Invalid email or password.");
+            authenticationResponse.setMessage("Invalid username or password.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authenticationResponse);
         }
 
