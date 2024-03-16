@@ -15,10 +15,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.kurupuxx.cakap.model.AuthenticationRequest;
-import com.kurupuxx.cakap.model.AuthenticationResponse;
 import com.kurupuxx.cakap.model.User;
 import com.kurupuxx.cakap.repository.UserRepository;
+import com.kurupuxx.cakap.request.AuthenticationRequest;
+import com.kurupuxx.cakap.response.AuthenticationResponse;
+import com.kurupuxx.cakap.response.GetDetailUserResponse;
 import com.kurupuxx.cakap.service.UserService;
 import com.kurupuxx.cakap.util.JwtUtil;
 
@@ -65,6 +66,7 @@ public class UserServiceImpl implements UserService {
 
             return ResponseEntity.ok(authenticationResponse);
         } catch (Exception e) {
+            System.out.println(e.getLocalizedMessage());
             authenticationResponse.setMessage(e.getLocalizedMessage());
 
             return ResponseEntity.internalServerError().body(authenticationResponse);
@@ -106,6 +108,34 @@ public class UserServiceImpl implements UserService {
                 user.getUsername(),
                 user.getPassword(),
                 new ArrayList<>());
+    }
+
+    @Override
+    public ResponseEntity<GetDetailUserResponse> getDetailUser(String token) {
+        GetDetailUserResponse response = new GetDetailUserResponse();
+        response.setTimestamp(new Date());
+
+        try {
+            String username = jwtUtil.extractUsername(token);
+
+            Optional<User> userOptional = userRepository.findByUsername(username);
+
+            if (!userOptional.isPresent()) {
+                response.setMessage("User not found!");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+
+            User user = userOptional.get();
+
+            response.setMessage("Success get user!");
+            response.setUser(user);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage(e.getLocalizedMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+
     }
 
 }

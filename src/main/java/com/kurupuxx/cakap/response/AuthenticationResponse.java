@@ -1,4 +1,4 @@
-package com.kurupuxx.cakap.model;
+package com.kurupuxx.cakap.response;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package com.kurupuxx.cakap.model;
+package com.kurupuxx.cakap.request;
 
 import lombok.Data;
 
