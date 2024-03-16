@@ -8,5 +8,10 @@
     "name": "jwt.expiration.key",
     "type": "java.lang.String",
     "description": "Expiration time for jwt authentication"
+  },
+  {
+    "name": "dir.image.profile.upload",
+    "type": "java.lang.String",
+    "description": "Path upload image profile"
   }
 ]}

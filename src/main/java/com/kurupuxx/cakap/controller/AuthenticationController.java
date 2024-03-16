@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.kurupuxx.cakap.model.User;
 import com.kurupuxx.cakap.request.AuthenticationRequest;
 import com.kurupuxx.cakap.response.AuthenticationResponse;
 import com.kurupuxx.cakap.response.GetDetailUserResponse;
@@ -25,8 +25,9 @@ public class AuthenticationController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> registerUser(@RequestBody User user) {
-        return userService.registerUser(user);
+    public ResponseEntity<AuthenticationResponse> registerUser(@RequestParam("imageProfile") MultipartFile imageProfile,
+            @RequestParam("user") String userJson) {
+        return userService.registerUser(imageProfile, userJson);
     }
 
     @PostMapping("/login")

@@ -1,10 +1,14 @@
 package com.kurupuxx.cakap.service.impl;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,7 +18,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kurupuxx.cakap.model.User;
 import com.kurupuxx.cakap.repository.UserRepository;
 import com.kurupuxx.cakap.request.AuthenticationRequest;
@@ -34,15 +41,21 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Value("${dir.image.profile.upload}")
+    private String uploadDir;
+
     @Autowired
     private JwtUtil jwtUtil;
 
     @Override
-    public ResponseEntity<AuthenticationResponse> registerUser(User user) {
+    public ResponseEntity<AuthenticationResponse> registerUser(MultipartFile imageProfile, String userJson) {
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setTimestamp(new Date());
 
         try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            User user = objectMapper.readValue(userJson, User.class);
+
             Optional<User> findUserByEmail = userRepository.findByEmail(user.getEmail());
             if (findUserByEmail.isPresent()) {
                 authenticationResponse.setMessage("Email already exists!");
@@ -53,6 +66,18 @@ public class UserServiceImpl implements UserService {
             if (findUserByUsername.isPresent()) {
                 authenticationResponse.setMessage("Username already exists!");
                 return ResponseEntity.badRequest().body(authenticationResponse);
+            }
+
+            if (imageProfile != null && !imageProfile.isEmpty()) {
+                @SuppressWarnings("null")
+                String fileName = StringUtils.cleanPath(imageProfile.getOriginalFilename());
+                Path uploadPath = Paths.get(uploadDir);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(imageProfile.getInputStream(), filePath);
+                user.setImageProfile(filePath.toString());
             }
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
