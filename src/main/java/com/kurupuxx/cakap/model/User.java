@@ -19,5 +19,5 @@ public class User {
     private String password;
     private String socketId;
     private String status;
-    private String imageProfile;
+    private String pathImageProfile;
 }

@@ -2,13 +2,15 @@ package com.kurupuxx.cakap.response;
 
 import java.util.Date;
 
-import com.kurupuxx.cakap.model.User;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class GetDetailUserResponse {
     private String message;
     private Date timestamp;
-    private User user;
+    private UserResponse user;
 }
