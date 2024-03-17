@@ -20,17 +20,13 @@ public class UserController {
 
     @GetMapping("/detail")
     public ResponseEntity<GetDetailUserResponse> getDetailUser(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
-
-        return userService.getDetailUser(token);
+        return userService.getDetailUser();
     }
 
     @SuppressWarnings("null")
     @GetMapping("/image")
-    public ResponseEntity<byte[]> kirimGambar(HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
-        
-        byte[] imageProfile = userService.getImageProfile(token);
+    public ResponseEntity<byte[]> kirimGambar() {        
+        byte[] imageProfile = userService.getImageProfile();
 
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG)

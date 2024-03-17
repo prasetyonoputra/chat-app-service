@@ -7,7 +7,7 @@ import com.kurupuxx.cakap.response.GetDetailUserResponse;
 
 @Service
 public interface UserService {
-    ResponseEntity<GetDetailUserResponse> getDetailUser(String token);
+    ResponseEntity<GetDetailUserResponse> getDetailUser();
 
-    byte[] getImageProfile(String token);
+    byte[] getImageProfile();
 }
