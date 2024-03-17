@@ -69,7 +69,8 @@ public class AuthencticationServiceImpl implements AuthenticationService {
 
             if (imageProfile != null && !imageProfile.isEmpty()) {
                 @SuppressWarnings("null")
-                String fileName = new Date().getTime() + "_" + StringUtils.cleanPath(imageProfile.getOriginalFilename());
+                String fileName = new Date().getTime() + "_"
+                        + StringUtils.cleanPath(imageProfile.getOriginalFilename());
                 Path uploadPath = Paths.get(uploadDir);
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);

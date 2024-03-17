@@ -53,7 +53,8 @@ public class ContactServiceImpl implements ContactService {
         List<ContactUserResponse> contacts = new ArrayList<>();
 
         for (User userContact : users) {
-            String confirmationStatus = contactRepository.findContactByUserAndUserToAdd(user, userContact).get().getConfirmationStatus().getName();
+            String confirmationStatus = contactRepository.findContactByUserAndUserToAdd(user, userContact).get()
+                    .getConfirmationStatus().getName();
             ContactUserResponse userResponse = ContactUserResponse.builder()
                     .email(userContact.getEmail())
                     .username(userContact.getUsername())
