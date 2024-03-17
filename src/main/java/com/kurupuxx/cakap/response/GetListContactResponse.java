@@ -9,5 +9,5 @@ import lombok.Data;
 public class GetListContactResponse {
     private String message;
     private Date timestamp;
-    private List<UserResponse> contacts;
+    private List<ContactUserResponse> contacts;
 }

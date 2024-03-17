@@ -18,8 +18,8 @@ import com.kurupuxx.cakap.repository.ContactRepository;
 import com.kurupuxx.cakap.repository.MasterConfirmationStatusRepository;
 import com.kurupuxx.cakap.repository.UserRepository;
 import com.kurupuxx.cakap.response.CommonResponse;
+import com.kurupuxx.cakap.response.ContactUserResponse;
 import com.kurupuxx.cakap.response.GetListContactResponse;
-import com.kurupuxx.cakap.response.UserResponse;
 import com.kurupuxx.cakap.service.ContactService;
 
 @Service
@@ -50,11 +50,11 @@ public class ContactServiceImpl implements ContactService {
         User user = userOptional.get();
 
         List<User> users = contactRepository.findAllContact(user);
-        List<UserResponse> contacts = new ArrayList<>();
+        List<ContactUserResponse> contacts = new ArrayList<>();
 
         for (User userContact : users) {
             String confirmationStatus = contactRepository.findContactByUserAndUserToAdd(user, userContact).get().getConfirmationStatus().getName();
-            UserResponse userResponse = UserResponse.builder()
+            ContactUserResponse userResponse = ContactUserResponse.builder()
                     .email(userContact.getEmail())
                     .username(userContact.getUsername())
                     .firstName(userContact.getFirstName())
@@ -151,5 +151,4 @@ public class ContactServiceImpl implements ContactService {
         response.setMessage("Success delete contact!");
         return ResponseEntity.ok(response);
     }
-
 }
