@@ -13,6 +13,6 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     @Query("SELECT c.userToAdd FROM Contact c WHERE c.user = :user")
     List<User> findAllContact(User user);
 
-    @Query("SELECT c.userToAdd FROM Contact c WHERE c.user = :user AND c.userToAdd = :userToAdd")
-    Optional<User> findContactByUserAndUserToAdd(User user, User userToAdd);
+    @Query("SELECT c FROM Contact c WHERE c.user = :user AND c.userToAdd = :userToAdd")
+    Optional<Contact> findContactByUserAndUserToAdd(User user, User userToAdd);
 }

@@ -8,6 +8,7 @@ import com.kurupuxx.cakap.response.GetListContactResponse;
 
 @Service
 public interface ContactService {
-    ResponseEntity<GetListContactResponse> getContacts(String token);
-    ResponseEntity<CommonResponse> addContact(String token, String username);
+    ResponseEntity<GetListContactResponse> getContacts();
+    ResponseEntity<CommonResponse> addContact(String username);
+    ResponseEntity<CommonResponse> deleteContact(Long idUser);
 }

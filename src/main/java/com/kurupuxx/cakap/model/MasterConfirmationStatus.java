@@ -6,30 +6,22 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "contacts")
-public class Contact {
+@Table(name = "master_confirmation_status")
+@NoArgsConstructor
+@AllArgsConstructor
+public class MasterConfirmationStatus {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "idUser")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "idUserToAdd")
-    private User userToAdd;
-    
-    @ManyToOne
-    @JoinColumn(name = "idConfirmationStatus")
-    private MasterConfirmationStatus confirmationStatus;
+    private String name;
+    private String value;
 
     private Date createdAt;
     private Date updatedAt;
