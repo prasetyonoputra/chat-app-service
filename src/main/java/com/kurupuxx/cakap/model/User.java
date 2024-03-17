@@ -1,5 +1,7 @@
 package com.kurupuxx.cakap.model;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,4 +22,7 @@ public class User {
     private String socketId;
     private String status;
     private String pathImageProfile;
+    private Date createdAt;
+    private Date updatedAt;
+    private String updatedBy;
 }

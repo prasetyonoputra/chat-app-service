@@ -69,7 +69,7 @@ public class AuthencticationServiceImpl implements AuthenticationService {
 
             if (imageProfile != null && !imageProfile.isEmpty()) {
                 @SuppressWarnings("null")
-                String fileName = StringUtils.cleanPath(imageProfile.getOriginalFilename());
+                String fileName = new Date().getTime() + "_" + StringUtils.cleanPath(imageProfile.getOriginalFilename());
                 Path uploadPath = Paths.get(uploadDir);
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
@@ -80,6 +80,9 @@ public class AuthencticationServiceImpl implements AuthenticationService {
             }
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setCreatedAt(new Date());
+            user.setUpdatedAt(new Date());
+            user.setUpdatedBy("SYSTEM");
             userRepository.save(user);
 
             UserDetails userDetails = loadUserByUsername(user.getUsername());
