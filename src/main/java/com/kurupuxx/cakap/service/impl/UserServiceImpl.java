@@ -26,13 +26,12 @@ public class UserServiceImpl implements UserService {
     @Value("${dir.image.profile.upload}")
     private String uploadDir;
 
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
     @Override
     public ResponseEntity<GetDetailUserResponse> getDetailUser() {
         GetDetailUserResponse response = new GetDetailUserResponse();
         response.setTimestamp(new Date());
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByUsername(authentication.getName()).get();
 
         UserResponse userResponse = UserResponse.builder()
@@ -51,6 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public byte[] getImageProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByUsername(authentication.getName()).get();
         try {
             return Files.readAllBytes(Paths.get(user.getPathImageProfile()));
