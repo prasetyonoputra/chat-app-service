@@ -1,10 +1,8 @@
 package com.kurupuxx.cakap.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
+import com.kurupuxx.cakap.model.MasterConfirmationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +40,7 @@ public class ContactServiceImpl implements ContactService {
 
         Optional<User> userOptional = userRepository.findByUsername(authentication.getName());
 
-        if (!userOptional.isPresent()) {
+        if (userOptional.isEmpty()) {
             response.setMessage("User not found!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
@@ -53,19 +51,24 @@ public class ContactServiceImpl implements ContactService {
         List<ContactUserResponse> contacts = new ArrayList<>();
 
         for (User userContact : users) {
-            String confirmationStatus = contactRepository.findContactByUserAndUserToAdd(user, userContact).get()
-                    .getConfirmationStatus().getName();
-            ContactUserResponse userResponse = ContactUserResponse.builder()
-                    .email(userContact.getEmail())
-                    .username(userContact.getUsername())
-                    .firstName(userContact.getFirstName())
-                    .lastName(userContact.getLastName())
-                    .status(userContact.getStatus())
-                    .confirmationStatus(confirmationStatus)
-                    .build();
+            Optional<Contact> optionalContact = contactRepository.findContactByUserAndUserToAdd(user, userContact);
+            if (optionalContact.isPresent()) {
+                Contact contact = optionalContact.get();
+                String confirmationStatus = contact.getConfirmationStatus().getName();
 
-            contacts.add(userResponse);
+                ContactUserResponse userResponse = ContactUserResponse.builder()
+                        .email(userContact.getEmail())
+                        .username(userContact.getUsername())
+                        .firstName(userContact.getFirstName())
+                        .lastName(userContact.getLastName())
+                        .status(userContact.getStatus())
+                        .confirmationStatus(confirmationStatus)
+                        .build();
+
+                contacts.add(userResponse);
+            }
         }
+
 
         response.setContacts(contacts);
         response.setMessage("Success get contact!");
@@ -79,62 +82,71 @@ public class ContactServiceImpl implements ContactService {
         response.setTimestamp(new Date());
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByUsername(authentication.getName()).get();
+        Optional<User> userOptional = userRepository.findByUsername(authentication.getName());
+        if (userOptional.isEmpty()) {
+            response.setMessage("User not found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        User user = userOptional.get();
+        if (user.getUsername().equals(username)) {
+            response.setMessage("You can't add yourself to contact!");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
         Optional<User> userToAddOptional = userRepository.findByUsername(username);
-        if (!userToAddOptional.isPresent()) {
+        if (userToAddOptional.isEmpty()) {
             response.setMessage("Username not found!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         User userToAdd = userToAddOptional.get();
-        if (userToAdd.getId() == user.getId()) {
-            response.setMessage("You can't add yourself to contact!");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
-
-        Optional<Contact> verifyContact = contactRepository.findContactByUserAndUserToAdd(user, userToAdd);
-        if (verifyContact.isPresent()) {
-            response.setMessage("User are exist in your contact!");
+        if (contactRepository.findContactByUserAndUserToAdd(user, userToAdd).isPresent()) {
+            response.setMessage("User already exists in your contacts!");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         Optional<Contact> confirmedContactOptional = contactRepository.findContactByUserAndUserToAdd(userToAdd, user);
-        Long confirmationId = 1L;
-        if (confirmedContactOptional.isPresent()) {
-            confirmationId = 2L;
+        long confirmationId = confirmedContactOptional.isPresent() ? 2L : 1L;
+        Optional<MasterConfirmationStatus> masterConfirmationStatusOptional = masterConfirmationStatusRepository.findById(confirmationId);
 
-            Contact confirmedContact = confirmedContactOptional.get();
-            confirmedContact.setConfirmationStatus(masterConfirmationStatusRepository.findById(confirmationId).get());
-            confirmedContact.setUpdatedAt(new Date());
-            confirmedContact.setUpdatedBy(user.getUsername());
+        if (masterConfirmationStatusOptional.isEmpty()) {
+            response.setMessage("Master Confirmation Status Not Found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
         Contact contact = new Contact();
         contact.setUser(user);
         contact.setUserToAdd(userToAdd);
-        contact.setConfirmationStatus(masterConfirmationStatusRepository.findById(confirmationId).get());
-        contact.setCreatedAt(new Date());
-        contact.setUpdatedAt(new Date());
+        contact.setConfirmationStatus(masterConfirmationStatusOptional.get());
+        Date now = new Date();
+        contact.setCreatedAt(now);
+        contact.setUpdatedAt(now);
         contact.setUpdatedBy(user.getUsername());
 
         contactRepository.save(contact);
 
-        response.setMessage("Success add contact!");
+        response.setMessage("Successfully added contact!");
         return ResponseEntity.ok(response);
     }
 
     @SuppressWarnings("null")
     @Override
-    public ResponseEntity<CommonResponse> deleteContact(Long idUser) {
+    public ResponseEntity<CommonResponse> deleteContact(String username) {
         CommonResponse response = new CommonResponse();
         response.setTimestamp(new Date());
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByUsername(authentication.getName()).get();
+        Optional<User> userOptional = userRepository.findByUsername(authentication.getName());
+        if (userOptional.isEmpty()) {
+            response.setMessage("User not found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
 
-        Optional<User> userToAddOptional = userRepository.findById(idUser);
-        if (!userToAddOptional.isPresent()) {
+        User user = userOptional.get();
+
+        Optional<User> userToAddOptional = userRepository.findByUsername(username);
+        if (userToAddOptional.isEmpty()) {
             response.setMessage("User not found!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
@@ -142,7 +154,7 @@ public class ContactServiceImpl implements ContactService {
         User userToAdd = userToAddOptional.get();
 
         Optional<Contact> contactToDelete = contactRepository.findContactByUserAndUserToAdd(user, userToAdd);
-        if (!contactToDelete.isPresent()) {
+        if (contactToDelete.isEmpty()) {
             response.setMessage("User not found on your contact!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }

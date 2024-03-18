@@ -12,5 +12,5 @@ public interface ContactService {
 
     ResponseEntity<CommonResponse> addContact(String username);
 
-    ResponseEntity<CommonResponse> deleteContact(Long idUser);
+    ResponseEntity<CommonResponse> deleteContact(String idUser);
 }

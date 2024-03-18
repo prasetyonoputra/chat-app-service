@@ -34,7 +34,7 @@ public class ContactController {
     }
 
     @DeleteMapping
-    public ResponseEntity<CommonResponse> deleteContact(@RequestParam("idUser") Long idUser) {
-        return contactService.deleteContact(idUser);
+    public ResponseEntity<CommonResponse> deleteContact(@RequestParam("username") String username) {
+        return contactService.deleteContact(username);
     }
 }
