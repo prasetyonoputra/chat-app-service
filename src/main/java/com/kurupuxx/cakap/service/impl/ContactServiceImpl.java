@@ -57,7 +57,6 @@ public class ContactServiceImpl implements ContactService {
                 String confirmationStatus = contact.getConfirmationStatus().getName();
 
                 ContactUserResponse userResponse = ContactUserResponse.builder()
-                        .email(userContact.getEmail())
                         .username(userContact.getUsername())
                         .firstName(userContact.getFirstName())
                         .lastName(userContact.getLastName())

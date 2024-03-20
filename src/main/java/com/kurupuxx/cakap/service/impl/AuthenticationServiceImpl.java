@@ -30,7 +30,7 @@ import com.kurupuxx.cakap.service.AuthenticationService;
 import com.kurupuxx.cakap.util.JwtUtil;
 
 @Service
-public class AuthencticationServiceImpl implements AuthenticationService {
+public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
     private UserRepository userRepository;
 
