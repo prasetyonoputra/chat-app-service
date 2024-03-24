@@ -10,5 +10,5 @@ import java.util.List;
 public class GetListChatResponse {
     private String message;
     private Date timestamp;
-    private List<Chat> chats;
+    private List<ChatResponse> chats;
 }

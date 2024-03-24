@@ -22,7 +22,7 @@ public class ChatController {
     @PostMapping
     public ResponseEntity<CommonResponse> sendChat(@RequestParam("usernameReceiver") String usernameReceiver,
                                                    @RequestParam("message") String message,
-                                                   @RequestParam("file") MultipartFile file) {
+                                                   @RequestParam(value = "file", required = false) MultipartFile file) {
 
         ChatRequest chatRequest = ChatRequest.builder()
                 .usernameReceiver(usernameReceiver)

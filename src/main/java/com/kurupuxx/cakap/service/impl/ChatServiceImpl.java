@@ -7,8 +7,10 @@ import com.kurupuxx.cakap.repository.ChatRepository;
 import com.kurupuxx.cakap.repository.ContactRepository;
 import com.kurupuxx.cakap.repository.UserRepository;
 import com.kurupuxx.cakap.request.ChatRequest;
+import com.kurupuxx.cakap.response.ChatResponse;
 import com.kurupuxx.cakap.response.CommonResponse;
 import com.kurupuxx.cakap.response.GetListChatResponse;
+import com.kurupuxx.cakap.response.UserResponse;
 import com.kurupuxx.cakap.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -94,11 +97,34 @@ public class ChatServiceImpl implements ChatService {
         }
         User userReceiver = userReceiverOptional.get();
 
+        List<Chat> rawChats = chatRepository.findByUserSenderAndUserReceiver(user, userReceiver);
+        List<ChatResponse> chats = new ArrayList<>();
 
-        List<Chat> chats = chatRepository.findByUserSenderAndUserReceiver(user, userReceiver);
+        for (Chat chat : rawChats) {
+            chats.add(ChatResponse.builder()
+                            .message(chat.getMessage())
+                            .pathFile(chat.getPathFile())
+                            .userSender(convertToUserResponse(chat.getUserSender()))
+                            .userReceiver(convertToUserResponse(chat.getUserReceiver()))
+                            .createdAt(chat.getCreatedAt())
+                            .updatedAt(chat.getUpdatedAt())
+                            .updatedBy(chat.getUpdatedBy())
+                    .build());
+        }
+
         response.setChats(chats);
         response.setMessage("Success get list chat!");
 
         return ResponseEntity.ok(response);
+    }
+
+    public UserResponse convertToUserResponse (User user) {
+        return UserResponse.builder()
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .username(user.getUsername())
+                .status(user.getStatus())
+                .build();
     }
 }

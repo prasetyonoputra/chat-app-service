@@ -22,6 +22,7 @@ public class User {
     private String username;
     private String password;
     private String status;
+    private String socketId;
     private String pathImageProfile;
     private Date createdAt;
     private Date updatedAt;

@@ -32,8 +32,6 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher("/api/user/**")
-                .securityMatcher("/api/chat/**")
-                .securityMatcher("/api/contact/**")
                 .authorizeHttpRequests(authorize -> authorize
                         .anyRequest().authenticated())
                         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

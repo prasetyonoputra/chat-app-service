@@ -1,8 +1,13 @@
 package com.kurupuxx.cakap.service.impl;
 
-import java.util.*;
-
+import com.kurupuxx.cakap.model.Contact;
 import com.kurupuxx.cakap.model.MasterConfirmationStatus;
+import com.kurupuxx.cakap.model.User;
+import com.kurupuxx.cakap.repository.ContactRepository;
+import com.kurupuxx.cakap.repository.MasterConfirmationStatusRepository;
+import com.kurupuxx.cakap.repository.UserRepository;
+import com.kurupuxx.cakap.response.*;
+import com.kurupuxx.cakap.service.ContactService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,15 +15,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.kurupuxx.cakap.model.Contact;
-import com.kurupuxx.cakap.model.User;
-import com.kurupuxx.cakap.repository.ContactRepository;
-import com.kurupuxx.cakap.repository.MasterConfirmationStatusRepository;
-import com.kurupuxx.cakap.repository.UserRepository;
-import com.kurupuxx.cakap.response.CommonResponse;
-import com.kurupuxx.cakap.response.ContactUserResponse;
-import com.kurupuxx.cakap.response.GetListContactResponse;
-import com.kurupuxx.cakap.service.ContactService;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ContactServiceImpl implements ContactService {
@@ -127,6 +127,48 @@ public class ContactServiceImpl implements ContactService {
 
         response.setMessage("Successfully added contact!");
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<GetDetailUserResponse> getDetailContact(String username) {
+        GetDetailUserResponse response = new GetDetailUserResponse();
+        response.setTimestamp(new Date());
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Optional<User> userOptional = userRepository.findByUsername(authentication.getName());
+        if (userOptional.isEmpty()) {
+            response.setMessage("User not found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        User user = userOptional.get();
+
+        Optional<User> userToGetOptional = userRepository.findByUsername(username);
+        if (userToGetOptional.isEmpty()) {
+            response.setMessage("User not found!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        User userToGet = userToGetOptional.get();
+
+        Optional<Contact> validateContact = contactRepository.findContactByUserAndUserToAdd(user, userToGet);
+        if (validateContact.isEmpty()) {
+            response.setMessage("User not found on your contact!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        response.setMessage("Success get data contact!");
+        response.setUser(UserResponse.builder()
+                            .email(userToGet.getEmail())
+                            .firstName(userToGet.getFirstName())
+                            .lastName(userToGet.getLastName())
+                            .username(userToGet.getUsername())
+                            .status(userToGet.getStatus())
+                            .build()
+        );
+
+        return ResponseEntity.ok(response);
+
     }
 
     @SuppressWarnings("null")

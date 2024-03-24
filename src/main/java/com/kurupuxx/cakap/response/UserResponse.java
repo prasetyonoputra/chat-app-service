@@ -11,4 +11,5 @@ public class UserResponse {
     private String lastName;
     private String username;
     private String status;
+    private String socketId;
 }

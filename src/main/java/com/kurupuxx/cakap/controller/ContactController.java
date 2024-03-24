@@ -2,6 +2,7 @@ package com.kurupuxx.cakap.controller;
 
 import java.util.Map;
 
+import com.kurupuxx.cakap.response.GetDetailUserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +32,12 @@ public class ContactController {
     public ResponseEntity<CommonResponse> addContact(@RequestBody Map<String, String> requestBody) {
 
         return contactService.addContact(requestBody.get("username"));
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<GetDetailUserResponse> getDetailContact(@RequestParam("username") String username) {
+
+        return contactService.getDetailContact(username);
     }
 
     @DeleteMapping
