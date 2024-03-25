@@ -9,7 +9,5 @@ import com.kurupuxx.cakap.response.GetDetailUserResponse;
 public interface UserService {
     ResponseEntity<GetDetailUserResponse> getDetailUser();
 
-    ResponseEntity<GetDetailUserResponse> getDetailUserByUsername(String username);
-
     byte[] getImageProfile();
 }

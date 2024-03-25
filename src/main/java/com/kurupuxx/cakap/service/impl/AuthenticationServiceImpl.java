@@ -1,12 +1,12 @@
 package com.kurupuxx.cakap.service.impl;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Optional;
-
+import com.kurupuxx.cakap.model.User;
+import com.kurupuxx.cakap.repository.UserRepository;
+import com.kurupuxx.cakap.request.LoginRequest;
+import com.kurupuxx.cakap.request.RegisterRequest;
+import com.kurupuxx.cakap.response.AuthenticationResponse;
+import com.kurupuxx.cakap.service.AuthenticationService;
+import com.kurupuxx.cakap.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,18 +19,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kurupuxx.cakap.model.User;
-import com.kurupuxx.cakap.repository.UserRepository;
-import com.kurupuxx.cakap.request.AuthenticationRequest;
-import com.kurupuxx.cakap.response.AuthenticationResponse;
-import com.kurupuxx.cakap.service.AuthenticationService;
-import com.kurupuxx.cakap.util.JwtUtil;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
+
     @Autowired
     private UserRepository userRepository;
 
@@ -40,43 +40,47 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @Value("${dir.image.profile.upload}")
-    private String uploadDir;
-
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Value("${dir.image.profile.upload}")
+    private String uploadDir;
+
     @Override
-    public ResponseEntity<AuthenticationResponse> registerUser(MultipartFile imageProfile, String userJson) {
+    public ResponseEntity<AuthenticationResponse> registerUser(RegisterRequest registerRequest) {
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setTimestamp(new Date());
 
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            User user = objectMapper.readValue(userJson, User.class);
-
-            Optional<User> findUserByEmail = userRepository.findByEmail(user.getEmail());
+            Optional<User> findUserByEmail = userRepository.findByEmail(registerRequest.getEmail());
             if (findUserByEmail.isPresent()) {
                 authenticationResponse.setMessage("Email already exists!");
                 return ResponseEntity.badRequest().body(authenticationResponse);
             }
 
-            Optional<User> findUserByUsername = userRepository.findByUsername(user.getUsername());
+            Optional<User> findUserByUsername = userRepository.findByUsername(registerRequest.getUsername());
             if (findUserByUsername.isPresent()) {
                 authenticationResponse.setMessage("Username already exists!");
                 return ResponseEntity.badRequest().body(authenticationResponse);
             }
 
-            if (imageProfile != null && !imageProfile.isEmpty()) {
-                @SuppressWarnings("null")
+            User user = User.builder()
+                    .email(registerRequest.getEmail())
+                    .firstName(registerRequest.getFirstName())
+                    .lastName(registerRequest.getLastName())
+                    .username(registerRequest.getUsername())
+                    .password(registerRequest.getPassword())
+                    .build();
+
+            if (registerRequest.getImageProfile() != null) {
                 String fileName = new Date().getTime() + "_"
-                        + StringUtils.cleanPath(imageProfile.getOriginalFilename());
+                        + StringUtils.cleanPath(Objects.requireNonNull(registerRequest.getImageProfile().getOriginalFilename()));
                 Path uploadPath = Paths.get(uploadDir);
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
                 }
                 Path filePath = uploadPath.resolve(fileName);
-                Files.copy(imageProfile.getInputStream(), filePath);
+                Files.copy(registerRequest.getImageProfile().getInputStream(), filePath);
                 user.setPathImageProfile(filePath.toString());
             }
 
@@ -102,7 +106,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public ResponseEntity<AuthenticationResponse> loginUser(AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> loginUser(LoginRequest request) {
         AuthenticationResponse authenticationResponse = new AuthenticationResponse();
         authenticationResponse.setTimestamp(new Date());
 
@@ -126,7 +130,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> userOptional = userRepository.findByUsername(username);
-        if (!userOptional.isPresent()) {
+        if (userOptional.isEmpty()) {
             throw new UsernameNotFoundException("User not found: " + username);
         }
 
@@ -137,5 +141,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 user.getPassword(),
                 new ArrayList<>());
     }
-
 }
