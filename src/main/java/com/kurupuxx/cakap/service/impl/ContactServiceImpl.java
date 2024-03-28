@@ -164,6 +164,7 @@ public class ContactServiceImpl implements ContactService {
                             .lastName(userToGet.getLastName())
                             .username(userToGet.getUsername())
                             .status(userToGet.getStatus())
+                            .socketId(userToGet.getSocketId())
                             .build()
         );
 

@@ -28,15 +28,15 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .securityMatcher("/api/user/**")
-                .authorizeHttpRequests(authorize -> authorize
-                        .anyRequest().authenticated())
-                        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
-    }
+    // @Bean
+    // public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    //     http
+    //             .securityMatcher("/api/user/**")
+    //             .authorizeHttpRequests(authorize -> authorize
+    //                     .anyRequest().authenticated())
+    //                     .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+    //     return http.build();
+    // }
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {

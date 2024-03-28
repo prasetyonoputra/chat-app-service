@@ -1,10 +1,9 @@
 package com.kurupuxx.cakap.response;
 
-import com.kurupuxx.cakap.model.Chat;
-import lombok.Data;
-
 import java.util.Date;
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class GetListChatResponse {

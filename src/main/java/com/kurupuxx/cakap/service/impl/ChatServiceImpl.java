@@ -34,6 +34,7 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     ContactRepository contactRepository;
 
+    @SuppressWarnings("null")
     @Override
     public ResponseEntity<CommonResponse> sendMessage(ChatRequest chatRequest) {
         CommonResponse response = new CommonResponse();

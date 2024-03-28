@@ -2,9 +2,13 @@ package com.kurupuxx.cakap.service.impl;
 
 import com.kurupuxx.cakap.model.User;
 import com.kurupuxx.cakap.repository.UserRepository;
+import com.kurupuxx.cakap.response.CommonResponse;
 import com.kurupuxx.cakap.response.GetDetailUserResponse;
 import com.kurupuxx.cakap.response.UserResponse;
 import com.kurupuxx.cakap.service.UserService;
+
+import io.micrometer.core.ipc.http.HttpSender.Response;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +55,24 @@ public class UserServiceImpl implements UserService {
         }
 
         return null;
+    }
+
+    @Override
+    public ResponseEntity<CommonResponse> setSocketId(String socketId) {
+        CommonResponse response = new CommonResponse();
+        response.setTimestamp(new Date());
+
+        
+        User user = getCurrentUser();
+        user.setSocketId(socketId);
+        user.setStatus("Online");
+        userRepository.save(user);
+
+        System.out.println(user.getUsername());
+        System.out.println(socketId);
+
+        response.setMessage("Success set socket id!");
+        return ResponseEntity.ok(response);
     }
 
     // Helper method to retrieve the current authenticated user

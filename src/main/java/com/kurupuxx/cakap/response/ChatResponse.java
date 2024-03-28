@@ -1,11 +1,9 @@
 package com.kurupuxx.cakap.response;
 
-import com.kurupuxx.cakap.model.User;
-import jakarta.persistence.*;
+import java.util.Date;
+
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.Date;
 
 @Data
 @Builder
