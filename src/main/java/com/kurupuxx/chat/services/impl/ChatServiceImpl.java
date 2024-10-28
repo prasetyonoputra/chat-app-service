@@ -56,7 +56,7 @@ public class ChatServiceImpl implements ChatService {
         }
         User userReceiver = userReceiverOptional.get();
 
-        Optional<Contact> verifyContactOptional = contactRepository.findContactByUserAndUserToAdd(user, userReceiver);
+        Optional<Contact> verifyContactOptional = contactRepository.findContactByAcceptorAndReceptor(user, userReceiver);
         if (verifyContactOptional.isEmpty()) {
             response.setMessage("User receiver not found in contact!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

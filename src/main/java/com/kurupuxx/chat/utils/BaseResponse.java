@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BaseResponse<T> {
+public class BaseResponse {
 	private int statusCode;
 	private String message;
-	private T data;
+	private Object data;
 	private boolean isError;
 }

@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,9 @@ import org.springframework.util.StringUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -40,6 +43,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Value("${dir.image.profile.upload}")
     private String uploadDir;
@@ -119,4 +125,26 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
                 new ArrayList<>());
     }
+
+    @Override
+    public Map<String, Boolean> checkToken(Map<String, String> request) throws Exception {
+        String jwtToken = request.get("token");
+
+        if (jwtToken == null || jwtToken.isEmpty()) {
+            throw new Exception("Token cannot empty!");
+        }
+
+        String username = jwtUtil.extractUsername(jwtToken);
+
+        if (username != null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            if (jwtUtil.validateToken(jwtToken, userDetails)) {
+                return Collections.singletonMap("is_valid", true);
+            }
+        }
+
+        throw new Exception("Token are invalid!");
+    }
+
 }

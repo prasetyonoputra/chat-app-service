@@ -10,9 +10,9 @@ import com.kurupuxx.chat.entities.Contact;
 import com.kurupuxx.chat.entities.User;
 
 public interface ContactRepository extends JpaRepository<Contact, Long> {
-    @Query("SELECT c.userToAdd FROM Contact c WHERE c.user = :user")
-    List<User> findAllContact(User user);
+    @Query("SELECT c.acceptor FROM Contact c WHERE c.requestor = :requestor")
+    List<User> findAllContact(User requestor);
 
-    @Query("SELECT c FROM Contact c WHERE c.user = :user AND c.userToAdd = :userToAdd")
-    Optional<Contact> findContactByUserAndUserToAdd(User user, User userToAdd);
+    @Query("SELECT c FROM Contact c WHERE c.requestor = :requestor AND c.acceptor = :acceptor")
+    Optional<Contact> findContactByAcceptorAndReceptor(User requestor, User acceptor);
 }

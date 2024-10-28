@@ -6,35 +6,40 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class BaseAppController {
-	protected <T> ResponseEntity<BaseResponse<T>> toResponse(T data) {
-		return ResponseEntity.ok(BaseResponse.<T>builder().data(data).statusCode(200).isError(false).build());
+	protected ResponseEntity<BaseResponse> toResponse(Object data) {
+		return ResponseEntity.ok(BaseResponse.builder().data(data).statusCode(200).isError(false).build());
 	}
 
-	protected <T> ResponseEntity<BaseResponse<T>> toResponse(T data, int statusCode) {
-		return ResponseEntity.ok(BaseResponse.<T>builder().data(data).statusCode(statusCode).isError(false).build());
+	protected ResponseEntity<BaseResponse> toResponse(Object data, int statusCode) {
+		return ResponseEntity.ok(BaseResponse.builder().data(data).statusCode(statusCode).isError(false).build());
 	}
 
-	protected <T> ResponseEntity<BaseResponse<T>> toResponse(T data, String message) {
+	protected ResponseEntity<BaseResponse> toResponse(Object data, String message) {
 		return ResponseEntity
-				.ok(BaseResponse.<T>builder().data(data).message(message).statusCode(200).isError(false).build());
+				.ok(BaseResponse.builder().data(data).message(message).statusCode(200).isError(false).build());
 	}
 
-	protected <T> ResponseEntity<BaseResponse<T>> toResponse(T data, int statusCode, String message) {
-		return ResponseEntity.ok(
-				BaseResponse.<T>builder().data(data).message(message).statusCode(statusCode).isError(false).build());
+	protected ResponseEntity<BaseResponse> toResponse(Object data, int statusCode, String message) {
+		return ResponseEntity
+				.ok(BaseResponse.builder().data(data).message(message).statusCode(statusCode).isError(false).build());
 	}
 
-	protected <T> ResponseEntity<BaseResponse<T>> toResponse(Exception exception) {
-		log.error("ERROR :: " + exception.getLocalizedMessage());
+	protected ResponseEntity<BaseResponse> toResponse(Exception exception) {
+		logError(exception.getLocalizedMessage());
 
-		return ResponseEntity.internalServerError().body(BaseResponse.<T>builder()
-				.message(exception.getLocalizedMessage()).statusCode(500).isError(true).build());
+		return ResponseEntity.internalServerError().body(
+				BaseResponse.builder().message(exception.getLocalizedMessage()).statusCode(500).isError(true).build());
 	}
 
-	protected <T> ResponseEntity<BaseResponse<T>> toResponse(Exception exception, int statusCode) {
-		log.error("ERROR :: " + exception.getLocalizedMessage());
+	protected ResponseEntity<BaseResponse> toResponse(Exception exception, int statusCode) {
+		logError(exception.getLocalizedMessage());
 
-		return ResponseEntity.internalServerError().body(BaseResponse.<T>builder()
-				.message(exception.getLocalizedMessage()).statusCode(statusCode).isError(true).build());
+		return ResponseEntity.internalServerError().body(BaseResponse.builder().message(exception.getLocalizedMessage())
+				.statusCode(statusCode).isError(true).build());
+	}
+
+
+	private void logError(String message) {
+        log.error("ERROR :: {}", message);
 	}
 }
